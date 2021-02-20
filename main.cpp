@@ -132,7 +132,7 @@ void execute(const string& cmd) {
     } else if (strcmp(first_token.c_str(),"modify") == 0) {
         if (search_token(cmd, 2).empty() || !search_token(cmd, 7).empty()) throw 1;
         if (users_online.empty() || users_online.top().second == -1) throw 1;
-        string token[6], parameter[6]={"42142","42142","42142","42142","42142","0123456421"};
+        string token[6], parameter[6]={"42142","42142","42142","42142","42142","012345642142"};
         for (int i = 1; i <= 5; i++) {
             token[i] = search_token(cmd, i + 1).empty() ? "42142" : search_token(cmd, i + 1);
             switch (token[i][1]) {
