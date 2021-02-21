@@ -47,6 +47,11 @@ void useradd(const string &user_id1, const string &passwd1, int privilege1, cons
     fout.close();
     node node1(user_id1, offset1);
     user_id_list.addnode(node1);
+    //record the operation
+    fout.open("operation.dat", ios::ate | ios::in | ios::out | ios::binary);
+    operation operation1("add the user",the_user(users_online.top().first).name,name1);
+    fout.write(reinterpret_cast<char *>(&operation1), sizeof(operation));
+    fout.close();
 }
 
 void Register(const string &user_id1, const string &passwd1, const string &name1) {
@@ -61,6 +66,11 @@ void Register(const string &user_id1, const string &passwd1, const string &name1
     fout.close();
     node node1(user_id1, offset1);
     user_id_list.addnode(node1);
+    //record the operation
+    fout.open("operation.dat", ios::ate | ios::in | ios::out | ios::binary);
+    operation operation1("register the user","the tourist",name1);
+    fout.write(reinterpret_cast<char *>(&operation1), sizeof(operation));
+    fout.close();
 }
 
 void Delete(const string &user_id1) {
@@ -68,6 +78,12 @@ void Delete(const string &user_id1) {
     if (user_id_list.findnode(user_id1).empty() || the_user(users_online.top().first).privilege != 7) throw 1;
     if (strcmp(user_id1.c_str(),"root") == 0) throw 1;
     user_id_list.dltnode(user_id_list.findnode(user_id1)[0]);
+    //record the operation
+    ofstream fout;
+    fout.open("operation.dat", ios::ate | ios::in | ios::out | ios::binary);
+    operation operation1("delete the user",the_user(users_online.top().first).name,the_user(user_id1).name);
+    fout.write(reinterpret_cast<char *>(&operation1), sizeof(operation));
+    fout.close();
 }
 
 void change_passwd(const string &user_id1, const string &old_passwd, const string &new_passwd) {
@@ -81,6 +97,11 @@ void change_passwd(const string &user_id1, const string &old_passwd, const strin
     fout.open("userdata.dat", ios::in | ios::out | ios::binary);
     fout.seekp(offset1);
     fout.write(reinterpret_cast<char *>(&user1), sizeof(user));
+    fout.close();
+    //record the operation
+    fout.open("operation.dat", ios::ate | ios::in | ios::out | ios::binary);
+    operation operation1("change the user's password",the_user(users_online.top().first).name,user1.name);
+    fout.write(reinterpret_cast<char *>(&operation1), sizeof(operation));
     fout.close();
 }
 
