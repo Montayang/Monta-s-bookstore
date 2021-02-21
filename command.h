@@ -10,4 +10,9 @@ void show(const string& parameter,string type);
 void show_finance(int time);
 void buy(const string& ISBN1,int quantity1);
 
+void report_finance();
+void report_employee();
+void report_myself();
+void log();
+
 #endif //BOOKSTORE_COMMAND_H
