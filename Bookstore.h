@@ -1,6 +1,7 @@
 #ifndef BOOKSTORE_BOOKSDTORE_H
 #define BOOKSTORE_BOOKSDTORE_H
 
+#include <ostream>
 #include "blocklist.h"
 #include "user.h"
 
@@ -29,5 +30,15 @@ public:
     transaction_record(double money1, const book& book1, int book_quantity1, const user& user1);
 };
 
+class operation {
+public:
+    char operate[100] = "";
+    char user_name[31] = "";
+    char object[31] = "";
+    operation() = default;
+    operation(const string& operate1, const string& user_name1, const string& object1);
+
+    friend ostream &operator<<(ostream &os, const operation &operation);
+};
 book the_book(const string& ISBN1);
 #endif //BOOKSTORE_BOOKSDTORE_H
