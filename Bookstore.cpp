@@ -28,3 +28,14 @@ book the_book(const string& ISBN1) {
 }
 
 transaction_record::transaction_record(double money1, const book &book1, int book_quantity1, const user &user1) : money(money1),operate_book(book1),book_quantity(book_quantity1),operate_user(user1){}
+
+operation::operation(const string &operate1, const string &user_name1, const string &object1) {
+    strcpy(operate,operate1.c_str());
+    strcpy(user_name,user_name1.c_str());
+    strcpy(object,object1.c_str());
+}
+
+ostream &operator<<(ostream &os, const operation &operation) {
+    os << operation.user_name <<"\t"<< operation.operate <<"\t"<< operation.object <<endl;
+    return os;
+}
