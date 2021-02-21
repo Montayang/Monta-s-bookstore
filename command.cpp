@@ -61,7 +61,7 @@ void modify(int offset1,const string& ISBN1, const string& name1, const string& 
     string name2=name1.empty()?book0.name:name1;
     string author2=author1.empty()?book0.author:author1;
     string keyword2=keyword1.empty()?book0.keyword:keyword1;
-    double price2=price1==42142?book0.price:price1;
+    double price2=price1==422?book0.price:price1;
     book book1(ISBN2,name2,author2,keyword2,price2,book0.quantity);
     //renew the blocklists
     if (!ISBN1.empty()) {
@@ -95,6 +95,11 @@ void modify(int offset1,const string& ISBN1, const string& name1, const string& 
     fout.seekp(offset1);
     fout.write(reinterpret_cast<char*>(&book1),sizeof(book));
     fout.close();
+    //record the operation
+    fout.open("operation.dat", ios::ate | ios::in | ios::out | ios::binary);
+    operation operation1("modify the book's information",the_user(users_online.top().first).name,book0.ISBN);
+    fout.write(reinterpret_cast<char *>(&operation1), sizeof(operation));
+    fout.close();
 }
 
 void import(int offset1, int quantity1, double cost_price) {
@@ -116,6 +121,11 @@ void import(int offset1, int quantity1, double cost_price) {
     fout.open("bookdata.dat", ios::in | ios::out | ios::binary);
     fout.seekp(offset1);
     fout.write(reinterpret_cast<char*>(&book1),sizeof(book));
+    fout.close();
+    //record the operation
+    fout.open("operation.dat", ios::ate | ios::in | ios::out | ios::binary);
+    operation operation1("import the books",the_user(users_online.top().first).name,book1.ISBN);
+    fout.write(reinterpret_cast<char *>(&operation1), sizeof(operation));
     fout.close();
 }
 
@@ -235,4 +245,87 @@ void buy(const string& ISBN1, int quantity1) {
     //output the cost
     printf("%.2f",book1.price*quantity1);
     cout<<endl;
+    //record the operation
+    fout.open("operation.dat", ios::ate | ios::in | ios::out | ios::binary);
+    operation operation1("buy the books",the_user(users_online.top().first).name,book1.ISBN);
+    fout.write(reinterpret_cast<char *>(&operation1), sizeof(operation));
+    fout.close();
+}
+
+void report_finance() {
+    if (users_online.empty() || the_user(users_online.top().first).privilege != 7) throw 1;
+    ifstream fin;
+    fin.open("transaction.dat",ios::ate | ios::in | ios::out | ios::binary);
+    int End=fin.tellg();
+    fin.seekg(0);
+    while (fin.tellg()!=End) {
+        transaction_record transaction_record1;
+        fin.read(reinterpret_cast<char *>(&transaction_record1), sizeof(transaction_record));
+        if (transaction_record1.book_quantity>0) {
+            cout<<"sale   ";
+            transaction_record1.money=-transaction_record1.money;
+        }
+        if (transaction_record1.book_quantity<0) {
+            cout<<"import ";
+            transaction_record1.book_quantity=-transaction_record1.book_quantity;
+        }
+        printf("%20s",transaction_record1.operate_book.ISBN);
+        printf("%10d",transaction_record1.book_quantity);
+        cout<<"          ";
+        printf("%.2f",transaction_record1.money);
+        cout<<endl;
+    }
+    fin.close();
+}
+
+void report_employee() {
+    if (users_online.empty() || the_user(users_online.top().first).privilege != 7) throw 1;
+    ifstream fin;
+    fin.open("userdata.dat",ios::ate | ios::in | ios::out | ios::binary);
+    int End=fin.tellg();
+    fin.seekg(0);
+    while (fin.tellg()!=End) {
+        user user1;
+        fin.read(reinterpret_cast<char *>(&user1), sizeof(user));
+        if (user1.privilege<3) continue;
+        ifstream f;
+        f.open("operation.dat",ios::ate | ios::in | ios::out | ios::binary);
+        int End1=f.tellg();
+        f.seekg(0);
+        while (f.tellg()!=End1) {
+            operation operation1;
+            f.read(reinterpret_cast<char *>(&operation1), sizeof(operation));
+            if (strcmp(operation1.user_name,user1.name) == 0) cout<<operation1;
+        }
+        f.close();
+    }
+    fin.close();
+}
+
+void report_myself() {
+    if (users_online.empty() || the_user(users_online.top().first).privilege < 3) throw 1;
+    user user1=the_user(users_online.top().first);
+    ifstream f;
+    f.open("operation.dat",ios::ate | ios::in | ios::out | ios::binary);
+    int End1=f.tellg();
+    f.seekg(0);
+    while (f.tellg()!=End1) {
+        operation operation1;
+        f.read(reinterpret_cast<char *>(&operation1), sizeof(operation));
+        if (strcmp(operation1.user_name,user1.name) == 0) cout<<operation1;
+    }
+    f.close();
+}
+
+void log() {
+    ifstream f;
+    f.open("operation.dat",ios::ate | ios::in | ios::out | ios::binary);
+    int End1=f.tellg();
+    f.seekg(0);
+    while (f.tellg()!=End1) {
+        operation operation1;
+        f.read(reinterpret_cast<char *>(&operation1), sizeof(operation));
+        cout<<operation1;
+    }
+    report_finance();
 }
