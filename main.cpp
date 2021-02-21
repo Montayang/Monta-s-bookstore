@@ -39,6 +39,8 @@ void initialize() {
         fx.close();
         fx.open("transaction.dat", ios::out | ios::binary);
         fx.close();
+        fx.open("operation.dat", ios::out | ios::binary);
+        fx.close();
         //the file stored the data of the blocklists
         fx.open("ISBN_list.dat", ios::out | ios::binary);
         fx.close();
@@ -132,9 +134,9 @@ void execute(const string& cmd) {
     } else if (strcmp(first_token.c_str(),"modify") == 0) {
         if (search_token(cmd, 2).empty() || !search_token(cmd, 7).empty()) throw 1;
         if (users_online.empty() || users_online.top().second == -1) throw 1;
-        string token[6], parameter[6]={"42142","42142","42142","42142","42142","012345642142"};
+        string token[6], parameter[6]={"422","422","422","422","422","0123456422"};
         for (int i = 1; i <= 5; i++) {
-            token[i] = search_token(cmd, i + 1).empty() ? "42142" : search_token(cmd, i + 1);
+            token[i] = search_token(cmd, i + 1).empty() ? "422" : search_token(cmd, i + 1);
             switch (token[i][1]) {
                 case 'I': parameter[1] = '\"'+token[i].substr(6)+'\"'; break;
                 case 'n': parameter[2] = token[i]; break;
@@ -186,6 +188,19 @@ void execute(const string& cmd) {
         buy(search_token(cmd,2), x);
         return;
     } else if (strcmp(first_token.c_str(),"exit") == 0 || strcmp(first_token.c_str(),"quit") == 0) {
+        if (!search_token(cmd, 2).empty()) throw 1;
         exit(0);
+    } else if (strcmp(first_token.c_str(),"report") == 0 && strcmp(search_token(cmd,2).c_str(),"finance") == 0) {
+        if (search_token(cmd, 2).empty() || !search_token(cmd, 3).empty()) throw 1;
+        report_finance();
+    } else if (strcmp(first_token.c_str(),"report") == 0 && strcmp(search_token(cmd,2).c_str(),"employee") == 0) {
+        if (search_token(cmd, 2).empty() || !search_token(cmd, 3).empty()) throw 1;
+        report_employee();
+    } else if (strcmp(first_token.c_str(),"report") == 0 && strcmp(search_token(cmd,2).c_str(),"myself") == 0) {
+        if (search_token(cmd, 2).empty() || !search_token(cmd, 3).empty()) throw 1;
+        report_myself();
+    } else if (strcmp(first_token.c_str(),"log") == 0) {
+        if (!search_token(cmd, 2).empty()) throw 1;
+        log();
     } else throw 1;
 }
